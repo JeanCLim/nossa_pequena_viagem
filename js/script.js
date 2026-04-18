@@ -97,6 +97,20 @@ window.addEventListener("keyup", (e) => (keys[e.key] = false));
 
 // ... (resto do seu código acima)
 
+// 1. Referências dos elementos (coloque isso fora das funções, no topo ou antes dos eventos)
+const finishBtn = document.getElementById("finish-btn");
+const finalOverlay = document.getElementById("final-overlay");
+
+// 2. Função Única para Finalizar (para não dar erro)
+function finalizarViagem() {
+  music.pause();
+  finalOverlay.style.display = "flex";
+  if (finishBtn) finishBtn.style.display = "none";
+  isMoving = false;
+  console.log("Viagem finalizada com sucesso.");
+}
+
+// 3. Evento do Botão Iniciar
 btn.addEventListener("click", () => {
   overlay.style.opacity = "0";
   music.play();
@@ -106,13 +120,10 @@ btn.addEventListener("click", () => {
     hint.style.display = "block";
   }, 1000);
 
-  // ALTERADO: O botão de finalizar agora aparece após 60 segundos (1 minuto)
+  // Aparece o botão após 1 minuto
   setTimeout(() => {
-    const finishBtn = document.getElementById("finish-btn");
-    if (finishBtn) {
-      finishBtn.style.display = "block";
-    }
-  }, 60000); // 60000ms = 1 minuto
+    if (finishBtn) finishBtn.style.display = "block";
+  }, 60000);
 
   if (!isMoving) {
     isMoving = true;
@@ -120,15 +131,24 @@ btn.addEventListener("click", () => {
   }
 });
 
-// NOVO: Atalho secreto para mostrar o botão ao apertar ESC
+// 4. Evento de Clique no Botão Finalizar
+if (finishBtn) {
+  finishBtn.addEventListener("click", finalizarViagem);
+}
+
+// 5. Evento de Teclado (Esc e Controles)
 window.addEventListener("keydown", (e) => {
+  // Atalho Esc
   if (e.key === "Escape") {
-    const finishBtn = document.getElementById("finish-btn");
     if (finishBtn) {
-      finishBtn.style.display = "block";
-      console.log("Atalho Esc ativado: botão exibido.");
+      finishBtn.style.display = "block"; // Mostra o botão
+      finalizarViagem(); // Finaliza direto
     }
   }
-  // Mantém sua lógica de teclas anterior abaixo (W, Setas, etc)
+  // Lógica de movimentação (W, Setas, etc)
   keys[e.key] = true;
+});
+
+window.addEventListener("keyup", (e) => {
+  keys[e.key] = false;
 });
