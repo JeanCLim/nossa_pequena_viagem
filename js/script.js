@@ -136,16 +136,15 @@ if (finishBtn) {
   finishBtn.addEventListener("click", finalizarViagem);
 }
 
-// 5. Evento de Teclado (Esc e Controles)
+// 5. Evento de Teclado (Apenas faz o botão aparecer)
 window.addEventListener("keydown", (e) => {
-  // Atalho Esc
   if (e.key === "Escape") {
     if (finishBtn) {
-      finishBtn.style.display = "block"; // Mostra o botão
-      finalizarViagem(); // Finaliza direto
+      finishBtn.style.display = "block"; // Apenas mostra o botão amarelo pulsando
+      console.log("Atalho Esc: Botão liberado!");
     }
   }
-  // Lógica de movimentação (W, Setas, etc)
+  // Lógica de movimentação das estrelas
   keys[e.key] = true;
 });
 
