@@ -106,13 +106,13 @@ btn.addEventListener("click", () => {
     hint.style.display = "block";
   }, 1000);
 
-  // NOVO BLOCO: O botão de finalizar só aparece após 20 segundos
+  // ALTERADO: O botão de finalizar agora aparece após 60 segundos (1 minuto)
   setTimeout(() => {
     const finishBtn = document.getElementById("finish-btn");
     if (finishBtn) {
       finishBtn.style.display = "block";
     }
-  }, 20000); // 20000ms = 20 segundos
+  }, 60000); // 60000ms = 1 minuto
 
   if (!isMoving) {
     isMoving = true;
@@ -120,13 +120,15 @@ btn.addEventListener("click", () => {
   }
 });
 
-// COLE O CÓDIGO DO NOVO BOTÃO LOGO ABAIXO, FORA DA FUNÇÃO ACIMA:
-const finishBtn = document.getElementById("finish-btn");
-const finalOverlay = document.getElementById("final-overlay");
-
-finishBtn.addEventListener("click", () => {
-  music.pause();
-  finalOverlay.style.display = "flex";
-  finishBtn.style.display = "none";
-  isMoving = false;
+// NOVO: Atalho secreto para mostrar o botão ao apertar ESC
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const finishBtn = document.getElementById("finish-btn");
+    if (finishBtn) {
+      finishBtn.style.display = "block";
+      console.log("Atalho Esc ativado: botão exibido.");
+    }
+  }
+  // Mantém sua lógica de teclas anterior abaixo (W, Setas, etc)
+  keys[e.key] = true;
 });
