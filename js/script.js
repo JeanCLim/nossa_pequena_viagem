@@ -6,7 +6,7 @@ const music = document.getElementById("bg-music");
 const hint = document.getElementById("controls-hint");
 
 let stars = [];
-let numStars = 1200;
+let numStars = 3000;
 let speed = 2;
 let targetSpeed = 2;
 let isMoving = false;
