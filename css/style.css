@@ -1,3 +1,6 @@
+/* Importando as fontes românticas do Google */
+@import url("https://fonts.googleapis.com/css2?family=Great+Vibes&family=Quicksand:wght@300;500&display=swap");
+
 body,
 html {
   margin: 0;
@@ -5,8 +8,8 @@ html {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: #000;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #000; /* Fundo preto que você pediu */
+  font-family: "Quicksand", sans-serif;
 }
 
 #ui-overlay {
@@ -23,51 +26,67 @@ html {
   text-align: center;
   z-index: 10;
   transition: opacity 1s ease;
+  /* Um leve degradê apenas para dar profundidade, mantendo o preto */
   background: radial-gradient(
     circle,
     rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 0.8) 100%
+    rgba(0, 0, 0, 0.9) 100%
   );
 }
 
+/* Título: Quer viajar comigo... */
 h1 {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 300;
+  font-size: 2.8rem;
+  margin-bottom: 10px;
+  letter-spacing: 2px;
 }
+
+/* Frase romântica: Posso te levar... */
 p {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-  opacity: 0.8;
+  font-family: "Great Vibes", cursive;
+  font-size: 2.2rem;
+  margin-bottom: 30px;
+  color: #f0f0f0;
+  opacity: 0.9;
 }
+
+/* Créditos lá embaixo */
 .credits {
   font-size: 0.9rem;
-  margin-top: 20px;
+  margin-top: 40px;
   color: #ffd700;
+  font-family: "Quicksand", sans-serif;
+  letter-spacing: 1px;
 }
 
 #start-btn {
-  padding: 15px 40px;
-  font-size: 1.2rem;
+  padding: 15px 45px;
+  font-size: 1.1rem;
   background-color: #ffd700;
+  color: #000;
   border: none;
   border-radius: 50px;
   cursor: pointer;
   font-weight: bold;
-  transition:
-    transform 0.2s,
-    background-color 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
 #start-btn:hover {
-  transform: scale(1.1);
-  background-color: #ffcc00;
+  transform: scale(1.05);
+  background-color: #d1c40a;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
 }
 
 #controls-hint {
   position: absolute;
   bottom: 20px;
   right: 20px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.3);
   font-size: 0.8rem;
   pointer-events: none;
   display: none;
