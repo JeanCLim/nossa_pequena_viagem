@@ -95,15 +95,38 @@ function draw() {
 window.addEventListener("keydown", (e) => (keys[e.key] = true));
 window.addEventListener("keyup", (e) => (keys[e.key] = false));
 
+// ... (resto do seu código acima)
+
 btn.addEventListener("click", () => {
   overlay.style.opacity = "0";
   music.play();
+
   setTimeout(() => {
     overlay.style.display = "none";
     hint.style.display = "block";
   }, 1000);
+
+  // NOVO BLOCO: O botão de finalizar só aparece após 20 segundos
+  setTimeout(() => {
+    const finishBtn = document.getElementById("finish-btn");
+    if (finishBtn) {
+      finishBtn.style.display = "block";
+    }
+  }, 20000); // 20000ms = 20 segundos
+
   if (!isMoving) {
     isMoving = true;
     draw();
   }
+});
+
+// COLE O CÓDIGO DO NOVO BOTÃO LOGO ABAIXO, FORA DA FUNÇÃO ACIMA:
+const finishBtn = document.getElementById("finish-btn");
+const finalOverlay = document.getElementById("final-overlay");
+
+finishBtn.addEventListener("click", () => {
+  music.pause();
+  finalOverlay.style.display = "flex";
+  finishBtn.style.display = "none";
+  isMoving = false;
 });

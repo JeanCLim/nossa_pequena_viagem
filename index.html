@@ -19,6 +19,15 @@
     </div>
 
     <canvas id="spaceCanvas"></canvas>
+    <button id="finish-btn" style="display: none">
+      Deseja finalizar a viagem?
+    </button>
+
+    <div id="final-overlay" style="display: none">
+      <h1>E aí, como foi? Gostou?</h1>
+      <p>Espero que tenha sido uma viagem incrível...</p>
+      <button onclick="location.reload()">Viajar novamente</button>
+    </div>
 
     <audio id="bg-music" loop>
       <source src="musica.mp3" type="audio/mpeg" />

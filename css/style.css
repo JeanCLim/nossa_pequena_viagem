@@ -95,3 +95,85 @@ p {
 canvas {
   display: block;
 }
+/* Botão de Finalizar (discreto no canto) */
+/* Botão de Finalizar Estilizado e Pulsando */
+#finish-btn {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 25px;
+  background-color: #ffd700; /* Mesmo amarelo do botão iniciar */
+  color: #000; /* Texto preto igual ao iniciar */
+  border: none;
+  border-radius: 50px; /* Arredondado igual ao outro */
+  cursor: pointer;
+  font-weight: bold;
+  font-family: "Quicksand", sans-serif;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  z-index: 20;
+  box-shadow: 0 0 15px hsla(51, 100%, 50%, 0.4);
+
+  /* Ativa a animação de pulsação */
+  animation: pulsar 1.5s infinite ease-in-out;
+}
+
+/* Definição do efeito de pulsação (coração) */
+@keyframes pulsar {
+  0% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.08); /* Aumenta um pouco */
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.7); /* Brilha mais */
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+  }
+}
+
+#finish-btn:hover {
+  background-color: hsla(
+    51,
+    100%,
+    50%,
+    0.4
+  ); /* Fica branco ao passar o mouse, igual ao outro */
+  animation: none; /* Para de pulsar quando o mouse está em cima */
+  transform: translateX(-50%) scale(1.1);
+}
+
+/* Tela de Feedback Final */
+#final-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  z-index: 100;
+  text-align: center;
+}
+
+#final-overlay h1 {
+  font-family: "Quicksand", sans-serif;
+  font-size: 3rem;
+}
+
+#final-overlay button {
+  margin-top: 20px;
+  padding: 10px 25px;
+  background: #ffd700;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
