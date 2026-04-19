@@ -1,9 +1,9 @@
-// 1. Pegar os elementos
-const canvas = document.getElementById("canvas");
+// 1. Pegar os elementos (CORRIGIDO PARA BATER COM SEU HTML)
+const canvas = document.getElementById("spaceCanvas");
 const ctx = canvas.getContext("2d");
 const btn = document.getElementById("start-btn");
-const overlay = document.getElementById("overlay");
-const music = document.getElementById("music");
+const overlay = document.getElementById("ui-overlay");
+const music = document.getElementById("bg-music");
 const finishBtn = document.getElementById("finish-btn");
 const finalOverlay = document.getElementById("final-overlay");
 
@@ -50,6 +50,8 @@ function draw() {
     star.z -= speed;
     if (star.z <= 0) {
       star.z = canvas.width;
+      star.x = Math.random() * canvas.width - canvas.width / 2;
+      star.y = Math.random() * canvas.height - canvas.height / 2;
     }
 
     const x = star.x / (star.z / canvas.width);
@@ -71,27 +73,50 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// 6. LOGICA DO BOTÃO INICIAR (O CORAÇÃO DO PROBLEMA)
+// Som de aceleração (Supernova)
+function playWarpSound(duracao) {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    oscillator.type = "sawtooth";
+    oscillator.frequency.setValueAtTime(60, audioCtx.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(
+      1200,
+      audioCtx.currentTime + duracao,
+    );
+    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duracao);
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + duracao);
+  } catch (e) {
+    console.log("Som sintético não suportado");
+  }
+}
+
+// 6. LOGICA DO BOTÃO INICIAR
 if (btn) {
   btn.onclick = function () {
-    console.log("Clique detectado!");
-
     // Inicia movimento
     isMoving = true;
-    speed = 1;
+    speed = 0.5;
     speedTarget = 5;
 
     // Esconde a tela inicial
     overlay.style.display = "none";
 
-    // Tenta tocar a música
+    // Toca a música
     if (music) {
-      music.play().catch((e) => console.log("Erro no play:", e));
+      music
+        .play()
+        .catch((e) => console.log("Clique na tela para liberar a música"));
     }
 
-    // Mostra o botão de finalizar após 1 minuto
+    // Mostra o botão de finalizar após 1 minuto (60000ms)
     setTimeout(() => {
-      if (finishBtn) finishBtn.style.display = "block";
+      if (finishBtn && !isExploding) finishBtn.style.display = "block";
     }, 60000);
   };
 }
@@ -102,24 +127,30 @@ function finalizarViagem() {
   isExploding = true;
   if (finishBtn) finishBtn.style.display = "none";
 
-  // Aceleração da supernova
-  warpTarget = 30;
-  speedTarget = 60;
+  // Som do pulo espacial e aceleração
+  const duracaoWarp = 4.0;
+  playWarpSound(duracaoWarp);
+
+  const acelerarIntervalo = setInterval(() => {
+    if (warpTarget < 30) warpTarget += 1.5;
+    if (speedTarget < 80) speedTarget += 3;
+  }, 100);
 
   setTimeout(() => {
+    clearInterval(acelerarIntervalo);
     if (music) music.pause();
     finalOverlay.style.display = "flex";
     isMoving = false;
-  }, 3000);
+  }, duracaoWarp * 1000);
 }
 
 if (finishBtn) {
   finishBtn.onclick = finalizarViagem;
 }
 
-// Atalho ESC
+// Atalho ESC para mostrar botão antes de 1 minuto
 window.onkeydown = function (e) {
-  if (e.key === "Escape" && isMoving) {
+  if (e.key === "Escape" && isMoving && !isExploding) {
     if (finishBtn) finishBtn.style.display = "block";
   }
 };
