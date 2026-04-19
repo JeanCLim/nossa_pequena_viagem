@@ -29,8 +29,8 @@ function resize() {
 window.addEventListener("resize", resize);
 resize();
 
-// 2.400 estrelas
-for (let i = 0; i < 20000; i++) {
+// 1. Criar as 2.400 estrelas
+for (let i = 0; i < 2400; i++) {
   stars.push({
     x: Math.random() * canvas.width - canvas.width / 2,
     y: Math.random() * canvas.height - canvas.height / 2,
@@ -38,7 +38,7 @@ for (let i = 0; i < 20000; i++) {
   });
 }
 
-// SOM DO TURBO (SHIFT)
+// SOM DO TURBO (SHIFT) - Ajustado para ser mais audível
 function startTurboSound() {
   if (turboOscillator) return;
   if (!audioCtx)
@@ -47,15 +47,15 @@ function startTurboSound() {
   turboOscillator = audioCtx.createOscillator();
   turboGain = audioCtx.createGain();
 
-  turboOscillator.type = "sine";
+  turboOscillator.type = "triangle"; // Som mais presente que o 'sine'
   turboOscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
   turboOscillator.frequency.exponentialRampToValueAtTime(
-    250,
+    280,
     audioCtx.currentTime + 2,
   );
 
-  turboGain.gain.setValueAtTime(0.01, audioCtx.currentTime); // Volume bem suave
-  turboGain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.5);
+  turboGain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+  turboGain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.5); // Volume aumentado
 
   turboOscillator.connect(turboGain);
   turboGain.connect(audioCtx.destination);
@@ -93,7 +93,7 @@ function playWarpSound(duracao) {
 function finalizarViagem() {
   if (isExploding) return;
   isExploding = true;
-  stopTurboSound(); // Garante que o som do turbo pare se estiver ativo
+  stopTurboSound();
 
   if (finishBtn) finishBtn.style.display = "none";
   if (hint) hint.style.display = "none";
@@ -118,9 +118,11 @@ function draw() {
 
   if (isMoving) {
     if (isExploding) {
+      // Aceleração da Supernova
       speed += (speedTarget - speed) * 0.02;
       warp += (warpTarget - warp) * 0.02;
     } else {
+      // Controles de Voo
       let currentMaxSpeed = 3;
       if (keys["Shift"]) {
         currentMaxSpeed = 16;
@@ -138,22 +140,18 @@ function draw() {
     }
   }
 
-  // Localize esse trecho dentro da sua função draw()
-ctx.save();
-ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.save();
+  ctx.translate(canvas.width / 2, canvas.height / 2);
 
-// Alteração aqui: 
-// Se estiver explodindo, usamos slice(0, 400) para pegar só as primeiras 400 estrelas
-const estrelasParaDesenhar = isExploding ? stars.slice(0, 400) : stars;
+  // REDUÇÃO DE ESTRELAS NA SUPERNOVA: Apenas 400 se estiver explodindo
+  const estrelasParaDesenhar = isExploding ? stars.slice(0, 400) : stars;
 
-estrelasParaDesenhar.forEach((star) => {
-    // ... todo o seu código atual de desenho de estrelas ...
-    // (não precisa mudar nada dentro do forEach)
+  estrelasParaDesenhar.forEach((star) => {
     star.z -= speed;
     if (star.z <= 0) {
-        star.z = canvas.width;
-        star.x = Math.random() * canvas.width - canvas.width / 2;
-        star.y = Math.random() * canvas.height - canvas.height / 2;
+      star.z = canvas.width;
+      star.x = Math.random() * canvas.width - canvas.width / 2;
+      star.y = Math.random() * canvas.height - canvas.height / 2;
     }
 
     const x = star.x / (star.z / canvas.width);
@@ -169,25 +167,26 @@ estrelasParaDesenhar.forEach((star) => {
     ctx.moveTo(x, y);
     ctx.lineTo(xPrev, yPrev);
     ctx.stroke();
-});
+  });
 
-ctx.restore();
+  ctx.restore();
+  requestAnimationFrame(draw);
+}
 
+// BOTÃO INICIAR
 if (btn) {
   btn.onclick = function () {
-    // DESPERTA O ÁUDIO (Adicione esta linha aqui)
+    // Desperta o contexto de áudio
     if (!audioCtx)
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
+    if (audioCtx.state === "suspended") audioCtx.resume();
 
     isMoving = true;
     speed = 0.5;
     speedTarget = 3;
     overlay.style.display = "none";
     if (hint) hint.style.display = "block";
-    if (music) music.play();
+    if (music) music.play().catch((e) => console.log("Erro áudio:", e));
 
     setTimeout(() => {
       if (finishBtn && !isExploding) finishBtn.style.display = "block";
@@ -195,6 +194,7 @@ if (btn) {
   };
 }
 
+// EVENTOS DE TECLADO
 window.addEventListener("keydown", (e) => {
   if (keys[e.key]) return;
   keys[e.key] = true;
