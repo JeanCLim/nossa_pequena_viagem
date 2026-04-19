@@ -138,15 +138,22 @@ function draw() {
     }
   }
 
-  ctx.save();
-  ctx.translate(canvas.width / 2, canvas.height / 2);
+  // Localize esse trecho dentro da sua função draw()
+ctx.save();
+ctx.translate(canvas.width / 2, canvas.height / 2);
 
-  stars.forEach((star) => {
+// Alteração aqui: 
+// Se estiver explodindo, usamos slice(0, 400) para pegar só as primeiras 400 estrelas
+const estrelasParaDesenhar = isExploding ? stars.slice(0, 400) : stars;
+
+estrelasParaDesenhar.forEach((star) => {
+    // ... todo o seu código atual de desenho de estrelas ...
+    // (não precisa mudar nada dentro do forEach)
     star.z -= speed;
     if (star.z <= 0) {
-      star.z = canvas.width;
-      star.x = Math.random() * canvas.width - canvas.width / 2;
-      star.y = Math.random() * canvas.height - canvas.height / 2;
+        star.z = canvas.width;
+        star.x = Math.random() * canvas.width - canvas.width / 2;
+        star.y = Math.random() * canvas.height - canvas.height / 2;
     }
 
     const x = star.x / (star.z / canvas.width);
@@ -162,11 +169,9 @@ function draw() {
     ctx.moveTo(x, y);
     ctx.lineTo(xPrev, yPrev);
     ctx.stroke();
-  });
+});
 
-  ctx.restore();
-  requestAnimationFrame(draw);
-}
+ctx.restore();
 
 if (btn) {
   btn.onclick = function () {
