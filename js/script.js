@@ -118,7 +118,7 @@ function finalizarViagem() {
 
   // 3. EFEITO VISUAL DE ZOOM (SALTO ESPACIAL)
   warp = 25; // Estica as estrelas ao máximo
-  speed = 60; // Velocidade extrema
+  speed = 100; // Velocidade extrema
 
   // 4. TRANSIÇÃO PARA A TELA FINAL
   setTimeout(() => {
