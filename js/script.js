@@ -30,7 +30,7 @@ window.addEventListener("resize", resize);
 resize();
 
 // 2.400 estrelas
-for (let i = 0; i < 2400; i++) {
+for (let i = 0; i < 20000; i++) {
   stars.push({
     x: Math.random() * canvas.width - canvas.width / 2,
     y: Math.random() * canvas.height - canvas.height / 2,
