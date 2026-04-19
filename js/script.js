@@ -137,7 +137,7 @@ function finalizarViagem() {
     isMoving = false;
     isExploding = false;
     warp = 0.7; // Reseta o rastro para o padrão
-  }, 1500);
+  }, 3000);
 }
 
 // Função para criar o som de "Vruum" eletrônico (opcional)
