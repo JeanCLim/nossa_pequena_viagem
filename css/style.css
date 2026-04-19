@@ -177,3 +177,22 @@ canvas {
   cursor: pointer;
   font-weight: bold;
 }
+/* Troca o cursor em todo o site por um coração */
+/* Usamos um emoji de coração como imagem do cursor */
+body,
+html,
+a,
+button {
+  cursor:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' style='font-size:18px'><text y='18'>🤍</text></svg>"),
+    auto !important;
+}
+
+/* Quando passar o mouse em botões, o coração pode mudar de cor ou tamanho */
+#start-btn:hover,
+#finish-btn:hover,
+#final-overlay button:hover {
+  cursor:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' style='font-size:18px'><text y='18'>✨</text></svg>"),
+    pointer !important;
+}

@@ -102,12 +102,25 @@ const finishBtn = document.getElementById("finish-btn");
 const finalOverlay = document.getElementById("final-overlay");
 
 // 2. Função Única para Finalizar (para não dar erro)
+let isExploding = false; // Variável para controlar o efeito supernova
+
 function finalizarViagem() {
-  music.pause();
-  finalOverlay.style.display = "flex";
-  if (finishBtn) finishBtn.style.display = "none";
-  isMoving = false;
-  console.log("Viagem finalizada com sucesso.");
+  if (isExploding) return; // Evita clicar duas vezes
+  isExploding = true;
+
+  // 1. Aceleração máxima das estrelas (Efeito Salto Espacial)
+  warp = 20; // Aumenta o rastro das estrelas drasticamente
+  speed = 50; // Aumenta a velocidade de movimento
+
+  // 2. Pequeno delay para ela sentir a aceleração antes de acabar
+  setTimeout(() => {
+    music.pause();
+    finalOverlay.style.display = "flex";
+    if (finishBtn) finishBtn.style.display = "none";
+    isMoving = false;
+    isExploding = false;
+    console.log("Viagem concluída com salto espacial.");
+  }, 1500); // 1.5 segundos de "explosão" antes da tela final
 }
 
 // 3. Evento do Botão Iniciar
