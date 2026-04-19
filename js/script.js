@@ -108,59 +108,58 @@ function finalizarViagem() {
   if (isExploding) return;
   isExploding = true;
 
-  // 1. SOME COM O BOTÃO NA HORA
   if (finishBtn) finishBtn.style.display = "none";
 
-  // 2. TOCA O SOM DE ACELERAÇÃO
-  // Se você tiver um arquivo, use: const warpSound = new Audio('vruum.mp3'); warpSound.play();
-  // Abaixo, um som sintético de aceleração caso não tenha o arquivo:
-  playWarpSound();
+  // 1. Duração do som (ajuste o tempo de rampagem para o novo tempo)
+  playWarpSound(3.0); // Passando 3 segundos para o som acompanhar
 
-  // 3. EFEITO VISUAL DE ZOOM (SALTO ESPACIAL)
-  warp = 25; // Estica as estrelas ao máximo
-  speed = 100; // Velocidade extrema
+  warp = 25;
+  speed = 60;
 
-  // 4. TRANSIÇÃO PARA A TELA FINAL
+  // 2. AUMENTAR O TEMPO AQUI (de 1500 para 3000)
   setTimeout(() => {
-    // Diminui o volume da música gradualmente antes de parar
     const fadeAudio = setInterval(() => {
       if (music.volume > 0.1) {
         music.volume -= 0.1;
       } else {
         clearInterval(fadeAudio);
         music.pause();
-        music.volume = 1; // Reseta para a próxima vez
+        music.volume = 1;
       }
-    }, 100);
+    }, 150); // Aumentei um pouco o intervalo do fade para ser mais suave
 
     finalOverlay.style.display = "flex";
     isMoving = false;
     isExploding = false;
-    warp = 0.7; // Reseta o rastro para o padrão
-  }, 3000);
+    warp = 0.7;
+  }, 3000); // <--- Aqui define a duração total (3000 = 3 segundos)
 }
 
-// Função para criar o som de "Vruum" eletrônico (opcional)
-function playWarpSound() {
+// Ajuste na função de som para aceitar o tempo dinâmico
+function playWarpSound(duracao) {
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   const oscillator = audioCtx.createOscillator();
   const gainNode = audioCtx.createGain();
 
   oscillator.type = "sine";
   oscillator.frequency.setValueAtTime(100, audioCtx.currentTime);
+  // Faz o som subir até o final da nova duração
   oscillator.frequency.exponentialRampToValueAtTime(
     800,
-    audioCtx.currentTime + 1.5,
+    audioCtx.currentTime + duracao,
   );
 
   gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+  gainNode.gain.exponentialRampToValueAtTime(
+    0.01,
+    audioCtx.currentTime + duracao,
+  );
 
   oscillator.connect(gainNode);
   gainNode.connect(audioCtx.destination);
 
   oscillator.start();
-  oscillator.stop(audioCtx.currentTime + 1.5);
+  oscillator.stop(audioCtx.currentTime + duracao);
 }
 
 // 3. Evento do Botão Iniciar
