@@ -47,7 +47,7 @@ function startTurboSound() {
   turboOscillator = audioCtx.createOscillator();
   turboGain = audioCtx.createGain();
 
-  turboOscillator.type = "sine";
+  turboOscillator.type = "triangle";
   turboOscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
   turboOscillator.frequency.exponentialRampToValueAtTime(
     250,
@@ -55,7 +55,7 @@ function startTurboSound() {
   );
 
   turboGain.gain.setValueAtTime(0.01, audioCtx.currentTime); // Volume bem suave
-  turboGain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.5);
+  turboGain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.5);
 
   turboOscillator.connect(turboGain);
   turboGain.connect(audioCtx.destination);
