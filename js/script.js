@@ -122,21 +122,36 @@ function draw() {
 }
 
 // Eventos
+// Evento do Botão Iniciar - CORRIGIDO
 btn.addEventListener("click", () => {
+  // 1. Inicia o movimento e define as velocidades iniciais
+  isMoving = true;
+  speed = 0.5; // Começa devagar
+  speedTarget = 5; // Vai acelerando até a velocidade de cruzeiro
+  warpTarget = 0.7;
+
+  // 2. Esconde o menu inicial
   overlay.style.opacity = "0";
-  music.play();
+
+  // 3. Tenta dar play na música (com tratamento de erro caso o navegador bloqueie)
+  music
+    .play()
+    .catch((e) =>
+      console.log("O navegador bloqueou o som inicial. Clique na tela!"),
+    );
+
   setTimeout(() => {
     overlay.style.display = "none";
     hint.style.display = "block";
   }, 1000);
 
+  // 4. Timer para o botão de finalizar (1 minuto)
   setTimeout(() => {
-    if (finishBtn && !isExploding) finishBtn.style.display = "block";
+    if (finishBtn && !isExploding) {
+      finishBtn.style.display = "block";
+    }
   }, 60000);
-
-  isMoving = true;
 });
-
 if (finishBtn) {
   finishBtn.addEventListener("click", finalizarViagem);
 }
