@@ -11,13 +11,11 @@ let stars = [];
 let isMoving = false;
 let isExploding = false;
 
-// Variáveis de controle de movimento e efeito
 let speed = 0;
 let warp = 0.7;
-let speedTarget = 5;
+let speedTarget = 0;
 let warpTarget = 0.7;
 
-// Configuração inicial do Canvas
 function resize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -35,21 +33,25 @@ for (let i = 0; i < 1000; i++) {
 }
 
 function playWarpSound(duracao) {
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
-  oscillator.type = "sawtooth";
-  oscillator.frequency.setValueAtTime(60, audioCtx.currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(
-    1200,
-    audioCtx.currentTime + duracao,
-  );
-  gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-  gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duracao);
-  oscillator.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-  oscillator.start();
-  oscillator.stop(audioCtx.currentTime + duracao);
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    oscillator.type = "sawtooth";
+    oscillator.frequency.setValueAtTime(60, audioCtx.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(
+      1200,
+      audioCtx.currentTime + duracao,
+    );
+    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duracao);
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + duracao);
+  } catch (e) {
+    console.log("Som de warp não suportado");
+  }
 }
 
 function finalizarViagem() {
@@ -60,10 +62,9 @@ function finalizarViagem() {
   const duracaoWarp = 4.0;
   playWarpSound(duracaoWarp);
 
-  // Inicia a aceleração gradual
   const acelerarIntervalo = setInterval(() => {
-    if (warpTarget < 30) warpTarget += 1;
-    if (speedTarget < 80) speedTarget += 2;
+    warpTarget += 1.5;
+    speedTarget += 3;
   }, 100);
 
   setTimeout(() => {
@@ -72,10 +73,8 @@ function finalizarViagem() {
     finalOverlay.style.display = "flex";
     isMoving = false;
     isExploding = false;
-    // Reseta valores para um possível reinício
     speed = 0;
-    speedTarget = 5;
-    warp = 0.7;
+    speedTarget = 0;
     warpTarget = 0.7;
   }, duracaoWarp * 1000);
 }
@@ -84,12 +83,12 @@ function draw() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Suavização do movimento (Interpolação)
   if (isMoving) {
     speed += (speedTarget - speed) * 0.05;
     warp += (warpTarget - warp) * 0.05;
   }
 
+  ctx.save();
   ctx.translate(canvas.width / 2, canvas.height / 2);
 
   stars.forEach((star) => {
@@ -104,54 +103,41 @@ function draw() {
     const y = star.y / (star.z / canvas.width);
     const r = (1 - star.z / canvas.width) * 2;
 
-    ctx.beginPath();
-    ctx.fillStyle = "white";
-    // O efeito de rastro (warp)
     const xPrev = star.x / ((star.z + speed * warp) / canvas.width);
     const yPrev = star.y / ((star.z + speed * warp) / canvas.width);
 
+    ctx.beginPath();
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = r > 0 ? r : 0.1;
     ctx.moveTo(x, y);
     ctx.lineTo(xPrev, yPrev);
-    ctx.lineWidth = r;
-    ctx.strokeStyle = "white";
     ctx.stroke();
   });
 
-  ctx.translate(-canvas.width / 2, -canvas.height / 2);
+  ctx.restore();
   requestAnimationFrame(draw);
 }
 
-// Eventos
-// Evento do Botão Iniciar - CORRIGIDO
+// LIGAR O BOTÃO INICIAR
 btn.addEventListener("click", () => {
-  // 1. Inicia o movimento e define as velocidades iniciais
+  console.log("Botão iniciar clicado!"); // Para você ver no F12 que funcionou
   isMoving = true;
-  speed = 0.5; // Começa devagar
-  speedTarget = 5; // Vai acelerando até a velocidade de cruzeiro
-  warpTarget = 0.7;
+  speed = 0.5;
+  speedTarget = 5;
 
-  // 2. Esconde o menu inicial
   overlay.style.opacity = "0";
-
-  // 3. Tenta dar play na música (com tratamento de erro caso o navegador bloqueie)
-  music
-    .play()
-    .catch((e) =>
-      console.log("O navegador bloqueou o som inicial. Clique na tela!"),
-    );
+  music.play().catch((err) => console.log("Play bloqueado: ", err));
 
   setTimeout(() => {
     overlay.style.display = "none";
     hint.style.display = "block";
   }, 1000);
 
-  // 4. Timer para o botão de finalizar (1 minuto)
   setTimeout(() => {
-    if (finishBtn && !isExploding) {
-      finishBtn.style.display = "block";
-    }
+    if (finishBtn && !isExploding) finishBtn.style.display = "block";
   }, 60000);
 });
+
 if (finishBtn) {
   finishBtn.addEventListener("click", finalizarViagem);
 }
@@ -162,4 +148,5 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
+// INICIA O LOOP DE DESENHO
 draw();
