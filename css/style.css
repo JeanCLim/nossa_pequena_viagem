@@ -196,3 +196,16 @@ button {
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' style='font-size:18px'><text y='18'>✨</text></svg>"),
     pointer !important;
 }
+#final-overlay {
+  /* ... seus estilos anteriores ... */
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

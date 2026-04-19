@@ -105,22 +105,62 @@ const finalOverlay = document.getElementById("final-overlay");
 let isExploding = false; // Variável para controlar o efeito supernova
 
 function finalizarViagem() {
-  if (isExploding) return; // Evita clicar duas vezes
+  if (isExploding) return;
   isExploding = true;
 
-  // 1. Aceleração máxima das estrelas (Efeito Salto Espacial)
-  warp = 20; // Aumenta o rastro das estrelas drasticamente
-  speed = 50; // Aumenta a velocidade de movimento
+  // 1. SOME COM O BOTÃO NA HORA
+  if (finishBtn) finishBtn.style.display = "none";
 
-  // 2. Pequeno delay para ela sentir a aceleração antes de acabar
+  // 2. TOCA O SOM DE ACELERAÇÃO
+  // Se você tiver um arquivo, use: const warpSound = new Audio('vruum.mp3'); warpSound.play();
+  // Abaixo, um som sintético de aceleração caso não tenha o arquivo:
+  playWarpSound();
+
+  // 3. EFEITO VISUAL DE ZOOM (SALTO ESPACIAL)
+  warp = 25; // Estica as estrelas ao máximo
+  speed = 60; // Velocidade extrema
+
+  // 4. TRANSIÇÃO PARA A TELA FINAL
   setTimeout(() => {
-    music.pause();
+    // Diminui o volume da música gradualmente antes de parar
+    const fadeAudio = setInterval(() => {
+      if (music.volume > 0.1) {
+        music.volume -= 0.1;
+      } else {
+        clearInterval(fadeAudio);
+        music.pause();
+        music.volume = 1; // Reseta para a próxima vez
+      }
+    }, 100);
+
     finalOverlay.style.display = "flex";
-    if (finishBtn) finishBtn.style.display = "none";
     isMoving = false;
     isExploding = false;
-    console.log("Viagem concluída com salto espacial.");
-  }, 1500); // 1.5 segundos de "explosão" antes da tela final
+    warp = 0.7; // Reseta o rastro para o padrão
+  }, 1500);
+}
+
+// Função para criar o som de "Vruum" eletrônico (opcional)
+function playWarpSound() {
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(100, audioCtx.currentTime);
+  oscillator.frequency.exponentialRampToValueAtTime(
+    800,
+    audioCtx.currentTime + 1.5,
+  );
+
+  gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  oscillator.start();
+  oscillator.stop(audioCtx.currentTime + 1.5);
 }
 
 // 3. Evento do Botão Iniciar
