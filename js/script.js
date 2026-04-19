@@ -47,7 +47,7 @@ function startTurboSound() {
   turboOscillator = audioCtx.createOscillator();
   turboGain = audioCtx.createGain();
 
-  turboOscillator.type = "triangle";
+  turboOscillator.type = "sine";
   turboOscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
   turboOscillator.frequency.exponentialRampToValueAtTime(
     250,
