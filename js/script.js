@@ -104,20 +104,27 @@ const finalOverlay = document.getElementById("final-overlay");
 // 2. Função Única para Finalizar (para não dar erro)
 let isExploding = false; // Variável para controlar o efeito supernova
 
+let warpTarget = 0.7; // Alvo do rastro das estrelas
+let speedTarget = 5; // Alvo da velocidade
+
 function finalizarViagem() {
   if (isExploding) return;
   isExploding = true;
 
   if (finishBtn) finishBtn.style.display = "none";
 
-  // 1. Duração do som (ajuste o tempo de rampagem para o novo tempo)
-  playWarpSound(3.0); // Passando 3 segundos para o som acompanhar
+  const duracaoWarp = 4.0; // 4 segundos de aceleração gradual
+  playWarpSound(duracaoWarp);
 
-  warp = 25;
-  speed = 60;
+  // Em vez de mudar fixo, vamos criar um intervalo que aumenta os alvos gradualmente
+  const acelerarGradualmente = setInterval(() => {
+    if (warpTarget < 30) warpTarget += 0.5; // Estica mais a cada frame
+    if (speedTarget < 80) speedTarget += 1; // Corre mais a cada frame
+  }, 50); // Atualiza a cada 50ms para ser suave
 
-  // 2. AUMENTAR O TEMPO AQUI (de 1500 para 3000)
   setTimeout(() => {
+    clearInterval(acelerarGradualmente);
+
     const fadeAudio = setInterval(() => {
       if (music.volume > 0.1) {
         music.volume -= 0.1;
@@ -126,13 +133,31 @@ function finalizarViagem() {
         music.pause();
         music.volume = 1;
       }
-    }, 150); // Aumentei um pouco o intervalo do fade para ser mais suave
+    }, 150);
 
     finalOverlay.style.display = "flex";
     isMoving = false;
     isExploding = false;
+
+    // Reseta os alvos para a próxima vez
+    warpTarget = 0.7;
+    speedTarget = 5;
     warp = 0.7;
-  }, 3000); // <--- Aqui define a duração total (3000 = 3 segundos)
+    speed = 5;
+  }, duracaoWarp * 1000);
+}
+
+// DENTRO DA SUA FUNÇÃO draw(), você precisa atualizar a velocidade e o warp
+// Procure onde você define warp e speed dentro do draw() e use isso:
+function draw() {
+  // ... (seu código de limpar o canvas)
+
+  // Isso faz a transição entre a velocidade atual e o "alvo" ser suave
+  speed += (speedTarget - speed) * 0.1;
+  warp += (warpTarget - warp) * 0.1;
+
+  // ... (resto da lógica das estrelas)
+  // Certifique-se de que a lógica das estrelas use as variáveis 'speed' e 'warp'
 }
 
 // Ajuste na função de som para aceitar o tempo dinâmico
@@ -141,19 +166,17 @@ function playWarpSound(duracao) {
   const oscillator = audioCtx.createOscillator();
   const gainNode = audioCtx.createGain();
 
-  oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(100, audioCtx.currentTime);
-  // Faz o som subir até o final da nova duração
+  oscillator.type = "sawtooth"; // Som mais "espacial" e encorpado que o 'sine'
+  oscillator.frequency.setValueAtTime(60, audioCtx.currentTime);
+
+  // O som sobe junto com a aceleração das estrelas
   oscillator.frequency.exponentialRampToValueAtTime(
-    800,
+    1200,
     audioCtx.currentTime + duracao,
   );
 
-  gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(
-    0.01,
-    audioCtx.currentTime + duracao,
-  );
+  gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duracao);
 
   oscillator.connect(gainNode);
   gainNode.connect(audioCtx.destination);
