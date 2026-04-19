@@ -1,4 +1,3 @@
-// 1. Pegar os elementos (CORRIGIDO PARA BATER COM SEU HTML)
 const canvas = document.getElementById("spaceCanvas");
 const ctx = canvas.getContext("2d");
 const btn = document.getElementById("start-btn");
@@ -7,16 +6,17 @@ const music = document.getElementById("bg-music");
 const finishBtn = document.getElementById("finish-btn");
 const finalOverlay = document.getElementById("final-overlay");
 
-// 2. Variáveis de estado
 let stars = [];
 let isMoving = false;
 let isExploding = false;
+
+// Variáveis de controle de movimento
 let speed = 0;
 let warp = 0.7;
 let speedTarget = 0;
 let warpTarget = 0.7;
+let keys = {}; // Objeto para rastrear teclas pressionadas
 
-// 3. Ajustar tamanho do Canvas
 function resize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -24,8 +24,8 @@ function resize() {
 window.addEventListener("resize", resize);
 resize();
 
-// 4. Criar as estrelas
-for (let i = 0; i < 800; i++) {
+// 1. TRIPPLICADA A QUANTIDADE: 2400 estrelas
+for (let i = 0; i < 2400; i++) {
   stars.push({
     x: Math.random() * canvas.width - canvas.width / 2,
     y: Math.random() * canvas.height - canvas.height / 2,
@@ -33,12 +33,48 @@ for (let i = 0; i < 800; i++) {
   });
 }
 
-// 5. Função de Desenho (Loop)
+function finalizarViagem() {
+  if (isExploding) return;
+  isExploding = true;
+  if (finishBtn) finishBtn.style.display = "none";
+
+  const duracaoWarp = 4.0;
+
+  const acelerarIntervalo = setInterval(() => {
+    if (warpTarget < 35) warpTarget += 1.5;
+    if (speedTarget < 85) speedTarget += 3;
+  }, 100);
+
+  setTimeout(() => {
+    clearInterval(acelerarIntervalo);
+    if (music) music.pause();
+    finalOverlay.style.display = "flex";
+    isMoving = false;
+  }, duracaoWarp * 1000);
+}
+
 function draw() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  if (isMoving) {
+  if (isMoving && !isExploding) {
+    // Lógica dos controles manuais
+    let currentMaxSpeed = 5;
+
+    if (keys["Shift"]) {
+      currentMaxSpeed = 15; // TURBO
+      warpTarget = 4;
+    } else if (keys["w"] || keys["W"] || keys["ArrowUp"]) {
+      currentMaxSpeed = 8; // ACELERAÇÃO
+      warpTarget = 2;
+    } else {
+      currentMaxSpeed = 3; // CRUZEIRO
+      warpTarget = 0.7;
+    }
+
+    speedTarget = currentMaxSpeed;
+
+    // Transição suave
     speed += (speedTarget - speed) * 0.05;
     warp += (warpTarget - warp) * 0.05;
   }
@@ -56,7 +92,7 @@ function draw() {
 
     const x = star.x / (star.z / canvas.width);
     const y = star.y / (star.z / canvas.width);
-    const r = (1 - star.z / canvas.width) * 2;
+    const r = (1 - star.z / canvas.width) * 1.5; // Estrelas levemente menores para não poluir
 
     const xPrev = star.x / ((star.z + speed * warp) / canvas.width);
     const yPrev = star.y / ((star.z + speed * warp) / canvas.width);
@@ -73,87 +109,37 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// Som de aceleração (Supernova)
-function playWarpSound(duracao) {
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    oscillator.type = "sawtooth";
-    oscillator.frequency.setValueAtTime(60, audioCtx.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(
-      1200,
-      audioCtx.currentTime + duracao,
-    );
-    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duracao);
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + duracao);
-  } catch (e) {
-    console.log("Som sintético não suportado");
-  }
-}
-
-// 6. LOGICA DO BOTÃO INICIAR
+// BOTÃO INICIAR
 if (btn) {
   btn.onclick = function () {
-    // Inicia movimento
     isMoving = true;
     speed = 0.5;
-    speedTarget = 5;
-
-    // Esconde a tela inicial
+    speedTarget = 3;
     overlay.style.display = "none";
+    if (music) music.play().catch((e) => console.log("Som bloqueado"));
 
-    // Toca a música
-    if (music) {
-      music
-        .play()
-        .catch((e) => console.log("Clique na tela para liberar a música"));
-    }
-
-    // Mostra o botão de finalizar após 1 minuto (60000ms)
     setTimeout(() => {
       if (finishBtn && !isExploding) finishBtn.style.display = "block";
     }, 60000);
   };
 }
 
-// 7. FINALIZAR VIAGEM
-function finalizarViagem() {
-  if (isExploding) return;
-  isExploding = true;
-  if (finishBtn) finishBtn.style.display = "none";
+// EVENTOS DE TECLADO
+window.addEventListener("keydown", (e) => {
+  keys[e.key] = true;
 
-  // Som do pulo espacial e aceleração
-  const duracaoWarp = 4.0;
-  playWarpSound(duracaoWarp);
+  // Atalho ESC
+  if (e.key === "Escape" && isMoving && !isExploding) {
+    if (finishBtn) finishBtn.style.display = "block";
+  }
+});
 
-  const acelerarIntervalo = setInterval(() => {
-    if (warpTarget < 30) warpTarget += 1.5;
-    if (speedTarget < 80) speedTarget += 3;
-  }, 100);
-
-  setTimeout(() => {
-    clearInterval(acelerarIntervalo);
-    if (music) music.pause();
-    finalOverlay.style.display = "flex";
-    isMoving = false;
-  }, duracaoWarp * 1000);
-}
+window.addEventListener("keyup", (e) => {
+  keys[e.key] = false;
+});
 
 if (finishBtn) {
   finishBtn.onclick = finalizarViagem;
 }
 
-// Atalho ESC para mostrar botão antes de 1 minuto
-window.onkeydown = function (e) {
-  if (e.key === "Escape" && isMoving && !isExploding) {
-    if (finishBtn) finishBtn.style.display = "block";
-  }
-};
-
-// Iniciar o loop de desenho
 draw();
