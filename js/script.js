@@ -170,6 +170,13 @@ function draw() {
 
 if (btn) {
   btn.onclick = function () {
+    // DESPERTA O ÁUDIO (Adicione esta linha aqui)
+    if (!audioCtx)
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+
     isMoving = true;
     speed = 0.5;
     speedTarget = 3;
