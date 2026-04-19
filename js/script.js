@@ -25,7 +25,7 @@ window.addEventListener("resize", resize);
 resize();
 
 // 1. TRIPPLICADA A QUANTIDADE: 2400 estrelas
-for (let i = 0; i < 2400; i++) {
+for (let i = 0; i < 10000; i++) {
   stars.push({
     x: Math.random() * canvas.width - canvas.width / 2,
     y: Math.random() * canvas.height - canvas.height / 2,
@@ -121,6 +121,8 @@ if (btn) {
     setTimeout(() => {
       if (finishBtn && !isExploding) finishBtn.style.display = "block";
     }, 60000);
+    const hint = document.getElementById("controls-hint");
+    if (hint) hint.style.display = "block"; // Isso faz a mensagem aparecer no canto
   };
 }
 
